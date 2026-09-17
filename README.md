@@ -3,7 +3,8 @@
 A multi-tenant support ticketing system built with Spring Boot, Kafka, Redis, PostgreSQL, and Elasticsearch — designed around event-driven architecture, real-time updates, and SLA tracking.
 
 ## Status
-🚧 In development — Module 0 (environment setup) complete.
+## Status
+🚧 In development — Module 0 (environment) complete. Module 1 (entities + repositories) complete. DTOs, service layer, controllers, security, and multi-tenancy still in progress.
 
 ## Tech Stack
 - Backend: Spring Boot
@@ -12,3 +13,4 @@ A multi-tenant support ticketing system built with Spring Boot, Kafka, Redis, Po
 - Database: PostgreSQL
 - Search: Elasticsearch
 - Deployment: Docker / Docker Compose
+- 
