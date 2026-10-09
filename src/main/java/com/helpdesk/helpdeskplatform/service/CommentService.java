@@ -8,8 +8,8 @@ import com.helpdesk.helpdeskplatform.entity.User;
 import com.helpdesk.helpdeskplatform.exception.ResourceNotFoundException;
 import com.helpdesk.helpdeskplatform.mapper.CommentMapper;
 import com.helpdesk.helpdeskplatform.repository.CommentRepository;
-import com.helpdesk.helpdeskplatform.repository.TicketRepository;
 import com.helpdesk.helpdeskplatform.repository.UserRepository;
+import com.helpdesk.helpdeskplatform.security.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,30 +21,27 @@ import java.util.List;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
     private final CommentMapper commentMapper;
+    private final TicketService ticketService;
 
     @Transactional
-    public CommentResponse addComment(Long organizationId, Long userId, Long ticketId, CommentCreateRequest request){
-        Ticket ticket = ticketRepository.findByIdAndOrganizationId(ticketId, organizationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    public CommentResponse addComment(AuthenticatedUser actor, Long ticketId, CommentCreateRequest request) {
+        Ticket ticket = ticketService.loadVisibleTicket(actor, ticketId);
+        User author = userRepository.findById(actor.userId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + actor.userId()));
 
         Comment comment = new Comment();
         comment.setTicket(ticket);
-        comment.setAuthor(user);
+        comment.setAuthor(author);
         comment.setBody(request.getBody());
 
         return commentMapper.toResponse(commentRepository.save(comment));
     }
 
     @Transactional(readOnly = true)
-    public List<CommentResponse> listComments(Long organizationId, Long ticketId){
-        ticketRepository.findByIdAndOrganizationId(ticketId, organizationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
-
+    public List<CommentResponse> listComments(AuthenticatedUser actor, Long ticketId) {
+        ticketService.loadVisibleTicket(actor, ticketId);
         return commentRepository.findByTicketIdOrderByCreatedAtAsc(ticketId).stream()
                 .map(commentMapper::toResponse)
                 .toList();

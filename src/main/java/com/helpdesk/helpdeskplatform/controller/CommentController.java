@@ -21,19 +21,13 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<CommentResponse> add(
-            @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable Long ticketId,
-            @Valid @RequestBody CommentCreateRequest request) {
-        CommentResponse created = commentService.addComment(
-                user.organizationId(), user.userId(), ticketId, request);
+    public ResponseEntity<CommentResponse> add(@AuthenticationPrincipal AuthenticatedUser user, @PathVariable Long ticketId, @Valid @RequestBody CommentCreateRequest request) {
+        CommentResponse created = commentService.addComment(user, ticketId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping
-    public ResponseEntity<List<CommentResponse>> list(
-            @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable Long ticketId) {
-        return ResponseEntity.ok(commentService.listComments(user.organizationId(), ticketId));
+    public ResponseEntity<List<CommentResponse>> list(@AuthenticationPrincipal AuthenticatedUser user, @PathVariable Long ticketId) {
+        return ResponseEntity.ok(commentService.listComments(user, ticketId));
     }
 }
