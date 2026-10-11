@@ -4,9 +4,11 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Filter;
 
 import java.time.Instant;
 
+@Filter(name = "tenantFilter", condition = "organization_id = :organizationId")
 @Entity
 @Table(name = "users")
 @Data

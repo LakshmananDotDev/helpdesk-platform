@@ -19,6 +19,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/tickets")
 @RequiredArgsConstructor
@@ -66,4 +68,5 @@ public class TicketController {
             @Valid @RequestBody TicketAssignRequest request) {
         return ResponseEntity.ok(ticketService.assignTicket(user, id, request));
     }
+
 }

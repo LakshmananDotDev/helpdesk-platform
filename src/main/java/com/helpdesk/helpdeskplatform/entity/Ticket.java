@@ -4,9 +4,14 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 import java.time.Instant;
 
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "organizationId", type = Long.class))
+@Filter(name = "tenantFilter", condition = "organization_id = :organizationId")
 @Entity
 @Table(name = "tickets")
 @Data
