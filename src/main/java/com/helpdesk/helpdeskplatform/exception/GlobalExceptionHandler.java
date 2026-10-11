@@ -1,6 +1,7 @@
 package com.helpdesk.helpdeskplatform.exception;
 
 import com.helpdesk.helpdeskplatform.dto.response.ApiError;
+import org.springframework.dao.DataIntegrityViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,6 +73,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<ApiError> handleAuthorizationDenied(AuthorizationDeniedException ex) {
         return build(HttpStatus.FORBIDDEN, "You do not have permission to perform this action", null);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiError> handleIntegrity(DataIntegrityViolationException ex) {
+        return build(HttpStatus.CONFLICT, "That value already exists", null);
     }
 
     @ExceptionHandler(Exception.class)

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.helpdesk.helpdeskplatform.dto.request.CreateOrganizationRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +38,7 @@ public class AuthService {
         User  user = new User();
         user.setEmail(request.getEmail());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole());
+        user.setRole(User.Role.CUSTOMER);
         user.setOrganization(organization);
 
         User saved = userRepository.save(user);
@@ -57,5 +58,30 @@ public class AuthService {
 
         String token = jwtService.generateToken(user);
         return new AuthResponse(token, user.getEmail(), user.getRole().name());
+    }
+
+
+    @Transactional
+    public AuthResponse registerOrganization(CreateOrganizationRequest request){
+        if(organizationRepository.findByName(request.getOrganizationName()).isPresent()){
+            throw new IllegalArgumentException("Organization already exists" + request.getOrganizationName());
+        }
+
+        if(userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email already exists" + request.getEmail());
+        }
+
+        Organization organization = new Organization();
+        organization.setName(request.getOrganizationName());
+        organization = organizationRepository.save(organization);
+
+        User admin = new User();
+        admin.setEmail(request.getEmail());
+        admin.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        admin.setRole(User.Role.ADMIN);
+        admin.setOrganization(organization);
+        User saved = userRepository.save(admin);
+
+        return new AuthResponse(jwtService.generateToken(saved), saved.getEmail(), saved.getRole().name());
     }
 }

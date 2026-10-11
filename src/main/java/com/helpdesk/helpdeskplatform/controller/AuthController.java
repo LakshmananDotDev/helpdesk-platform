@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.helpdesk.helpdeskplatform.dto.request.CreateOrganizationRequest;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -27,5 +29,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(authService.login(loginRequest));
+    }
+
+    @PostMapping("/register-organization")
+    public ResponseEntity<AuthResponse> registerOrganization(@Valid @RequestBody CreateOrganizationRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.registerOrganization(request));
     }
 }
