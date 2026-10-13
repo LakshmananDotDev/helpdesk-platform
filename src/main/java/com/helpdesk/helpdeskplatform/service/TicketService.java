@@ -21,6 +21,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.helpdesk.helpdeskplatform.event.TicketEventType;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class TicketService {
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
     private final TicketMapper ticketMapper;
+    private final OutboxService outboxService;
 
     @Transactional
     public TicketResponse createTicket(AuthenticatedUser actor, TicketCreateRequest request) {
@@ -45,7 +47,9 @@ public class TicketService {
         ticket.setDescription(request.getDescription());
         ticket.setPriority(request.getPriority());
 
-        return ticketMapper.toResponse(ticketRepository.save(ticket));
+        Ticket saved = ticketRepository.save(ticket);
+        outboxService.recordTicketEvent(TicketEventType.TICKET_CREATED, saved);
+        return ticketMapper.toResponse(saved);
     }
 
     @Transactional(readOnly = true)
@@ -86,7 +90,9 @@ public class TicketService {
         if (request.getStatus() != null) ticket.setStatus(request.getStatus());
         if (request.getPriority() != null) ticket.setPriority(request.getPriority());
 
-        return ticketMapper.toResponse(ticketRepository.saveAndFlush(ticket));
+        Ticket saved = ticketRepository.saveAndFlush(ticket);
+        outboxService.recordTicketEvent(TicketEventType.TICKET_UPDATED, saved);
+        return ticketMapper.toResponse(saved);
     }
 
     @Transactional
@@ -104,7 +110,9 @@ public class TicketService {
         }
 
         ticket.setAssignedTo(assignee);
-        return ticketMapper.toResponse(ticketRepository.saveAndFlush(ticket));
+        Ticket saved = ticketRepository.saveAndFlush(ticket);
+        outboxService.recordTicketEvent(TicketEventType.TICKET_ASSIGNED, saved);
+        return ticketMapper.toResponse(saved);
     }
 
     public Ticket loadVisibleTicket(AuthenticatedUser actor, Long ticketId) {

@@ -19,3 +19,7 @@ function Call($method, $path, $tok, $body) {
 }
 
 $login = { param($e) (Invoke-RestMethod -Method Post -Uri http://localhost:8080/api/auth/login -ContentType "application/json" -Body (@{email=$e;password="password123"} | ConvertTo-Json)).token }
+
+function Sql($query) {
+  $query | docker exec -i helpdesk-postgres psql -U helpdesk_user -d helpdesk -P pager=off
+}
