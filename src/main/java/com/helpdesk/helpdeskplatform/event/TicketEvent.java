@@ -12,7 +12,6 @@ public record TicketEvent(
         String priority,
         Long assignedToId,
         Long version,
-        Instant occuredAt
-){
-
+        Instant occurredAt
+) {
 }
