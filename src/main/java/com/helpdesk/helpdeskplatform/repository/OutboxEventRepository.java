@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface OutboxEventRepository extends JpaRepository<OutBoxEvent, Long> {
     List<OutBoxEvent> findTop50ByPublishedAtIsNullOrderByIdAsc();
+
+    boolean existsByEventId(String eventId);
 }

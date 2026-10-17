@@ -4,4 +4,5 @@ public enum TicketEventType {
     TICKET_CREATED,
     TICKET_UPDATED,
     TICKET_ASSIGNED,
+    SLA_BREACHED
 }

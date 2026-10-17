@@ -1,5 +1,6 @@
 package com.helpdesk.helpdeskplatform.config;
 
+import org.apache.kafka.common.TopicPartition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
@@ -14,7 +15,9 @@ public class KafkaConsumerConfig {
 
     @Bean
     public DefaultErrorHandler kafkaErrorHandler(KafkaTemplate<String, String> kafkaTemplate) {
-        DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate);
+        DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(
+                kafkaTemplate,
+                (record, ex) -> new TopicPartition(KafkaTopicConfig.TICKET_EVENTS_DLT, record.partition()));
         return new DefaultErrorHandler(recoverer, new FixedBackOff(1000L, 3L));
     }
 

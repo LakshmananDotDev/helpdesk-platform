@@ -22,9 +22,12 @@ public class OutboxService {
     private final ObjectMapper objectMapper;
 
     @Transactional(propagation = Propagation.MANDATORY)
-    public void recordTicketEvent(TicketEventType type, Ticket ticket){
-        String eventId = UUID.randomUUID().toString();
+    public void recordTicketEvent(TicketEventType type, Ticket ticket) {
+        recordTicketEvent(type, ticket, UUID.randomUUID().toString());
+    }
 
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void recordTicketEvent(TicketEventType type, Ticket ticket, String eventId) {
         TicketEvent event = new TicketEvent(
                 eventId,
                 type.name(),
@@ -47,5 +50,4 @@ public class OutboxService {
 
         outboxEventRepository.save(row);
     }
-
 }
